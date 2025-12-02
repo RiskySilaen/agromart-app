@@ -1,0 +1,39 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  phone     String
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id       Int     @id @default(autoincrement())
+  name     String
+  price    Float
+  rating   Float
+  category String
+  stock    Int
+}
+
+model Contact {
+  id      Int      @id @default(autoincrement())
+  name    String
+  email   String
+  phone   String
+  message String
+  date    DateTime @default(now())
+}
+
+// Catatan: Untuk Cart dan Order, kita simpan di LocalStorage dulu 
+// agar transisi tidak terlalu rumit untuk pemula.
