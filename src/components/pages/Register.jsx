@@ -53,10 +53,12 @@ function Register({ showNotification, updateUser }) {
             DAFTAR
           </h2>
 
+          // ... kode atas tetap sama ...
+
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="text"
-              id="regName"
+              id="name"  // <-- SEBELUMNYA "regName" (GANTI JADI "name")
               value={formData.name}
               onChange={handleChange}
               placeholder="Nama lengkap"
@@ -65,7 +67,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="email"
-              id="regEmail"
+              id="email" // <-- SEBELUMNYA "regEmail" (GANTI JADI "email")
               value={formData.email}
               onChange={handleChange}
               placeholder="Email"
@@ -74,7 +76,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="tel"
-              id="regPhone"
+              id="phone" // <-- SEBELUMNYA "regPhone" (GANTI JADI "phone")
               value={formData.phone}
               onChange={handleChange}
               placeholder="Telepon"
@@ -83,7 +85,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="password"
-              id="regPassword"
+              id="password" // <-- SEBELUMNYA "regPassword" (GANTI JADI "password")
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"

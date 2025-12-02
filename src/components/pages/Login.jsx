@@ -48,7 +48,7 @@ function Login({ showNotification, updateUser }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
-              id="loginEmail"
+              id="email" // <-- SEBELUMNYA "loginEmail" (GANTI JADI "email")
               value={formData.email}
               onChange={handleChange}
               placeholder="Email"
@@ -57,14 +57,14 @@ function Login({ showNotification, updateUser }) {
             />
             <input
               type="password"
-              id="loginPassword"
+              id="password" // <-- SEBELUMNYA "loginPassword" (GANTI JADI "password")
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
               className="w-full px-4 py-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-green-700 text-sm"
               required
             />
-
+            
             <button
               type="submit"
               className="bg-green-100/80 hover:bg-white text-black font-bold py-2 px-10 rounded-full mt-4 shadow-lg transition w-full"

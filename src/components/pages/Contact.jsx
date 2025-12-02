@@ -63,7 +63,7 @@ function Contact({ showNotification }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
-              id="contactName"
+              id="name" 
               value={formData.name}
               onChange={handleChange}
               placeholder="Nama lengkap"
@@ -72,7 +72,7 @@ function Contact({ showNotification }) {
             />
             <input
               type="email"
-              id="contactEmail"
+              id="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="Email"
@@ -81,7 +81,7 @@ function Contact({ showNotification }) {
             />
             <input
               type="tel"
-              id="contactPhone"
+              id="phone"
               value={formData.phone}
               onChange={handleChange}
               placeholder="Telepon"
@@ -89,7 +89,7 @@ function Contact({ showNotification }) {
               required
             />
             <textarea
-              id="contactMessage"
+              id="message"
               value={formData.message}
               onChange={handleChange}
               placeholder="Pesan"
