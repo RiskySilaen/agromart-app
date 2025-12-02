@@ -20,8 +20,9 @@ function Register({ showNotification, updateUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Tambahkan 'await'
-   const result = await db.registerUser(
+
+    // Menggunakan await karena database.js sekarang async (fetch API)
+    const result = await db.registerUser(
       formData.name,
       formData.email,
       formData.phone,
@@ -56,7 +57,7 @@ function Register({ showNotification, updateUser }) {
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="text"
-              id="name"  // <-- SEBELUMNYA "regName" (GANTI JADI "name")
+              id="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Nama lengkap"
@@ -65,7 +66,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="email"
-              id="email" // <-- SEBELUMNYA "regEmail" (GANTI JADI "email")
+              id="email"
               value={formData.email}
               onChange={handleChange}
               placeholder="Email"
@@ -74,7 +75,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="tel"
-              id="phone" // <-- SEBELUMNYA "regPhone" (GANTI JADI "phone")
+              id="phone"
               value={formData.phone}
               onChange={handleChange}
               placeholder="Telepon"
@@ -83,7 +84,7 @@ function Register({ showNotification, updateUser }) {
             />
             <input
               type="password"
-              id="password" // <-- SEBELUMNYA "regPassword" (GANTI JADI "password")
+              id="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
