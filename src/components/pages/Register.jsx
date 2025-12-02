@@ -53,8 +53,6 @@ function Register({ showNotification, updateUser }) {
             DAFTAR
           </h2>
 
-          // ... kode atas tetap sama ...
-
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="text"
