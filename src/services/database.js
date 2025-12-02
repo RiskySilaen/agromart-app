@@ -141,8 +141,22 @@ class AgroMartDB {
     return { success: true, order: newOrder };
   }
   
-  saveContact(name, email, phone, message) {
-     return true;
+  // --- CONTACT (UPDATED: Fetch ke API) ---
+  async saveContact(name, email, phone, message) {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, message }),
+      });
+      
+      if (!res.ok) throw new Error('Gagal mengirim');
+      
+      return await res.json();
+    } catch (error) {
+      console.error("Gagal kirim pesan:", error);
+      return { success: false, message: "Gagal terhubung ke server" };
+    }
   }
 }
 
