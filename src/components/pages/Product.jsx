@@ -1,6 +1,32 @@
 import React, { useState, useEffect } from "react";
-// 1. IMPORT LOGO
+// Import Logo & Gambar Produk
 import logoAgromart from "../../assets/logo_agromart.png";
+import pisangImg from "../../assets/pisang.jpg";
+import apelImg from "../../assets/apel.jpg";
+import tomatImg from "../../assets/tomat.jpg";
+import semangkaImg from "../../assets/semangka.jpg";
+import wortelImg from "../../assets/wortel.jpg";
+import nanasImg from "../../assets/nanas.jpg"; // Sudah ada gambarnya sekarang
+import cabeMerahImg from "../../assets/cabe_merah.jpg";
+import cabeHijauImg from "../../assets/cabe_hijau.jpg";
+import anggurImg from "../../assets/anggur.jpg";
+import jerukImg from "../../assets/jeruk.jpg";
+import buncisImg from "../../assets/buncis.jpg";
+
+// Mapping Nama Produk ke File Gambar
+const productImages = {
+  "Pisang": pisangImg,
+  "Apel": apelImg,
+  "Tomat": tomatImg,
+  "Semangka": semangkaImg,
+  "Wortel": wortelImg,
+  "Nanas": nanasImg,
+  "Cabe Merah": cabeMerahImg,
+  "Cabe Hijau": cabeHijauImg,
+  "Anggur": anggurImg,
+  "Jeruk": jerukImg,
+  "Buncis": buncisImg,
+};
 
 function Product({ showNotification, db }) {
   const [products, setProducts] = useState([]);
@@ -44,7 +70,6 @@ function Product({ showNotification, db }) {
     <section className="container mx-auto p-6 flex flex-col">
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 rounded-full border-2 border-agro-green overflow-hidden bg-white shrink-0 flex items-center justify-center">
-          {/* 2. GANTI IKON DENGAN IMAGE */}
           <img 
             src={logoAgromart} 
             alt="Logo Agromart" 
@@ -77,13 +102,14 @@ function Product({ showNotification, db }) {
                 key={product.id}
                 className="bg-white p-3 rounded-2xl shadow-soft flex flex-col items-center text-center cursor-pointer hover:scale-105 transition"
               >
-                <div className="h-20 w-full mb-2 bg-gray-100 rounded flex items-center justify-center">
-                  <i
-                    className={`fas ${
-                      product.category === "buah" ? "fa-apple-alt" : "fa-carrot"
-                    } text-3xl text-agro-green`}
-                  ></i>
+                <div className="h-28 w-full mb-2 bg-white rounded-xl overflow-hidden flex items-center justify-center">
+                  <img 
+                    src={productImages[product.name] || logoAgromart} 
+                    alt={product.name}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
+                
                 <div className="w-full text-left px-1">
                   <div className="text-yellow-400 text-xs">
                     <i className="fa-solid fa-star"></i> {product.rating}

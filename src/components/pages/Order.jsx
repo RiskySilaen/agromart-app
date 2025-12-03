@@ -1,6 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Import Gambar Produk
+import pisangImg from "../../assets/pisang.jpg";
+import apelImg from "../../assets/apel.jpg";
+import tomatImg from "../../assets/tomat.jpg";
+import semangkaImg from "../../assets/semangka.jpg";
+import wortelImg from "../../assets/wortel.jpg";
+import nanasImg from "../../assets/nanas.jpg";
+import cabeMerahImg from "../../assets/cabe_merah.jpg";
+import cabeHijauImg from "../../assets/cabe_hijau.jpg";
+import anggurImg from "../../assets/anggur.jpg";
+import jerukImg from "../../assets/jeruk.jpg";
+import buncisImg from "../../assets/buncis.jpg";
+import logoAgromart from "../../assets/logo_agromart.png"; // Untuk fallback
+
+const productImages = {
+  "Pisang": pisangImg,
+  "Apel": apelImg,
+  "Tomat": tomatImg,
+  "Semangka": semangkaImg,
+  "Wortel": wortelImg,
+  "Nanas": nanasImg,
+  "Cabe Merah": cabeMerahImg,
+  "Cabe Hijau": cabeHijauImg,
+  "Anggur": anggurImg,
+  "Jeruk": jerukImg,
+  "Buncis": buncisImg,
+};
+
 function Order({ showNotification, db }) {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
@@ -12,15 +40,14 @@ function Order({ showNotification, db }) {
     loadData();
   }, []);
 
-  // Tambahkan 'async'
   const loadData = async () => {
-    const allProducts = await db.getProducts(); // Tambahkan 'await'
+    const allProducts = await db.getProducts();
     const cartItems = db.getCart();
     setProducts(allProducts);
     setFilteredProducts(allProducts);
     setCart(cartItems);
   };
-  
+
   const updateCartQuantity = (productId, newQuantity) => {
     if (newQuantity < 0) newQuantity = 0;
     db.updateCartItem(productId, newQuantity);
@@ -61,6 +88,7 @@ function Order({ showNotification, db }) {
 
   return (
     <section className="container mx-auto p-6 flex flex-col md:flex-row gap-8">
+      {/* SIDEBAR KERANJANG */}
       <div className="w-full md:w-1/3 bg-agro-green rounded-3xl p-6 text-white shadow-xl flex flex-col h-[600px]">
         <h2 className="font-serif text-xl text-center mb-6">Pesanan anda</h2>
 
@@ -77,8 +105,13 @@ function Order({ showNotification, db }) {
                 className="flex items-center gap-3 border-b border-gray-100 pb-2"
               >
                 <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
-                <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center">
-                  <i className="fas fa-apple-alt text-lg text-agro-green"></i>
+                {/* GAMBAR KECIL DI KERANJANG */}
+                <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                   <img 
+                    src={productImages[item.name] || logoAgromart} 
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="flex-grow">
                   <div className="text-sm font-bold">{item.name}</div>
@@ -120,6 +153,7 @@ function Order({ showNotification, db }) {
         </div>
       </div>
 
+      {/* GRID DAFTAR PRODUK */}
       <div className="w-full md:w-2/3">
         <input
           type="text"
@@ -146,14 +180,13 @@ function Order({ showNotification, db }) {
                   key={product.id}
                   className="bg-white p-4 rounded-xl shadow-soft text-center flex flex-col items-center"
                 >
-                  <div className="h-20 w-full mb-2 bg-gray-100 rounded flex items-center justify-center">
-                    <i
-                      className={`fas ${
-                        product.category === "buah"
-                          ? "fa-apple-alt"
-                          : "fa-carrot"
-                      } text-3xl text-agro-green`}
-                    ></i>
+                  {/* GAMBAR PRODUK DI GRID */}
+                  <div className="h-24 w-full mb-2 bg-white rounded-lg overflow-hidden flex items-center justify-center">
+                    <img 
+                      src={productImages[product.name] || logoAgromart} 
+                      alt={product.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div className="text-yellow-400 text-xs mb-1">
                     <i className="fa-solid fa-star"></i> {product.rating}
