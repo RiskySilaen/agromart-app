@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+// 1. IMPORT LOGO
+import logoAgromart from "../../assets/logo_agromart.png";
 
 function Product({ showNotification, db }) {
   const [products, setProducts] = useState([]);
@@ -10,7 +12,7 @@ function Product({ showNotification, db }) {
   }, []);
 
   const loadProducts = async () => {
-    const allProducts = await db.getProducts(); // Tambahkan 'await'
+    const allProducts = await db.getProducts();
     setProducts(allProducts);
     setFilteredProducts(allProducts);
   };
@@ -40,11 +42,14 @@ function Product({ showNotification, db }) {
 
   return (
     <section className="container mx-auto p-6 flex flex-col">
-      {" "}
-      {/* HAPUS "page-section" */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-16 h-16 rounded-full border-2 border-agro-green overflow-hidden bg-white shrink-0 flex items-center justify-center">
-          <i className="fas fa-leaf text-2xl text-agro-green"></i>
+          {/* 2. GANTI IKON DENGAN IMAGE */}
+          <img 
+            src={logoAgromart} 
+            alt="Logo Agromart" 
+            className="w-full h-full object-cover" 
+          />
         </div>
         <div className="flex-grow">
           <h2 className="font-serif text-2xl text-gray-800 mb-1">PRODUK</h2>

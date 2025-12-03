@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../services/database";
+// 1. IMPORT LOGO
+import logoAgromart from "../../assets/logo_agromart.png";
 
 function Contact({ showNotification }) {
   const [formData, setFormData] = useState({
@@ -18,10 +20,10 @@ function Contact({ showNotification }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    db.saveContact(
+    await db.saveContact(
       formData.name,
       formData.email,
       formData.phone,
@@ -50,7 +52,12 @@ function Contact({ showNotification }) {
         <div className="bg-agro-green w-full md:w-1/2 p-8 flex flex-col items-center justify-center text-center text-white">
           <h2 className="font-serif text-2xl mb-6">KONTAK</h2>
           <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center mb-8 border-4 border-white overflow-hidden">
-            <i className="fas fa-leaf text-4xl text-agro-green"></i>
+            {/* 2. GANTI IKON DENGAN IMAGE */}
+            <img 
+              src={logoAgromart} 
+              alt="Logo Agromart" 
+              className="w-full h-full object-cover" 
+            />
           </div>
           <p className="text-xs opacity-80 leading-relaxed px-4">
             saran dan tanggapan anda merupakan semangat untuk kami terus maju
@@ -63,7 +70,7 @@ function Contact({ showNotification }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
-              id="name" 
+              id="name"
               value={formData.name}
               onChange={handleChange}
               placeholder="Nama lengkap"
