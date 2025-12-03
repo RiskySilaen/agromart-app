@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+// 1. IMPORT LOGO AGROMART
+import logoAgromart from "../../assets/logo_agromart.png";
 
 function OpeningAnimation() {
   const [morphDone, setMorphDone] = useState(false);
@@ -79,12 +81,17 @@ function OpeningAnimation() {
         <div className="flex flex-col items-center">
           <div
             id="final-logo-img"
-            className="w-48 h-48 bg-white rounded-full flex items-center justify-center border-4 border-agro-green shadow-2xl transition-transform duration-1500 ease-out"
+            className="w-48 h-48 bg-white rounded-full flex items-center justify-center border-4 border-agro-green shadow-2xl transition-transform duration-1500 ease-out overflow-hidden"
             style={{
               transform: zoomDone ? "scale(1)" : "scale(0.5)",
             }}
           >
-            <i className="fas fa-leaf text-6xl text-agro-green"></i>
+            {/* 2. GANTI IKON DENGAN GAMBAR LOGO */}
+            <img 
+              src={logoAgromart} 
+              alt="Logo Agromart" 
+              className="w-full h-full object-cover" 
+            />
           </div>
         </div>
       </div>
