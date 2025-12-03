@@ -1,15 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
+// 1. Import Logo Agromart
+import logoAgromart from "../../assets/logo_agromart.png";
 
 function Home() {
   return (
     <section className="container mx-auto flex-grow flex items-center justify-center p-6 min-h-[80vh]">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center w-full max-w-6xl">
+        
+        {/* BAGIAN GAMBAR / LOGO */}
         <div className="flex justify-center md:justify-end">
           <div className="w-72 h-72 md:w-96 md:h-96 rounded-full flex items-center justify-center bg-white shadow-xl border-4 border-agro-green overflow-hidden animate-fade-in-up">
-            <i className="fas fa-leaf text-9xl text-agro-green"></i>
+            {/* 2. Ganti ikon <i> dengan <img> */}
+            <img 
+              src={logoAgromart} 
+              alt="Sayang Agromart Logo" 
+              className="w-full h-full object-cover" 
+            />
           </div>
         </div>
+
+        {/* BAGIAN TEKS */}
         <div
           className="text-center md:text-left space-y-6 animate-fade-in-up"
           style={{ animationDelay: "0.2s" }}
