@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-function Navbar({ currentUser, onLogout, showNotification }) {
+// Hapus 'showNotification' dan 'useLocation' karena tidak dipakai
+function Navbar({ currentUser, onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -55,13 +56,13 @@ function Navbar({ currentUser, onLogout, showNotification }) {
         {/* BAGIAN KANAN (TOMBOL MENU HP) */}
         <div className="md:hidden">
           <button onClick={toggleMenu} className="focus:outline-none">
-            <i className={`fa-solid ${isMenuOpen ? "fa-xmark" : "fa-bars"} text-2xl`}></i>
+            {/* Menggunakan fa-times yang lebih umum untuk tanda silang */}
+            <i className={`fa-solid ${isMenuOpen ? "fa-times" : "fa-bars"} text-2xl`}></i>
           </button>
         </div>
       </div>
 
       {/* === MENU MOBILE === */}
-      {/* Kode ini memastikan menu muncul di bawah navbar saat isMenuOpen = true */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-agro-green border-t border-green-700 shadow-xl flex flex-col items-center py-4 space-y-4 font-serif text-sm tracking-widest z-40">
           <Link to="/contact" onClick={closeMenu} className="hover:text-green-300 w-full text-center py-3">KONTAK</Link>
