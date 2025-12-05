@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // 1. IMPORT GAMBAR (Pastikan banana.jpg sudah di-rename)
-import bananaImg from "../../assets/banana.jpg";
+import bananaImg from "../../assets/buah_banana.jpg";
 import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/tomat.jpg";
 import semangkaImg from "../../assets/semangka.jpg";
@@ -17,7 +17,7 @@ import logoAgromart from "../../assets/logo_agromart.png";
 
 // 2. MAPPING GAMBAR
 const productImages = {
-  "Banana": bananaImg, // <-- Kunci "Banana" sesuai database
+  "Banana":buah_bananaImg, // <-- Kunci "Banana" sesuai database
   "Apel": apelImg,
   "Tomat": tomatImg,
   "Semangka": semangkaImg,
