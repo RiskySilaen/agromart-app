@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   const products = [
-    { name: "Pisang", price: 15000, rating: 4.5, category: "buah", stock: 50 },
+    { name: "Banana", price:  15000, rating: 4.5, category: "buah", stock: 50 },
     { name: "Apel", price: 25000, rating: 4.7, category: "buah", stock: 30 },
     { name: "Tomat", price: 20000, rating: 4.8, category: "sayur", stock: 40 },
     { name: "Semangka", price: 18000, rating: 4.8, category: "buah", stock: 20 },
