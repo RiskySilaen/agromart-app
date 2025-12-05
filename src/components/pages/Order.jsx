@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Import Gambar Produk
-import pisangImg from "../../assets/pisang.jpg";
+// 1. IMPORT GAMBAR (Pastikan banana.jpg sudah di-rename)
+import bananaImg from "../../assets/banana.jpg";
 import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/tomat.jpg";
 import semangkaImg from "../../assets/semangka.jpg";
@@ -13,10 +13,11 @@ import cabeHijauImg from "../../assets/cabe_hijau.jpg";
 import anggurImg from "../../assets/anggur.jpg";
 import jerukImg from "../../assets/jeruk.jpg";
 import buncisImg from "../../assets/buncis.jpg";
-import logoAgromart from "../../assets/logo_agromart.png"; // Untuk fallback
+import logoAgromart from "../../assets/logo_agromart.png"; 
 
+// 2. MAPPING GAMBAR
 const productImages = {
-  "Pisang": pisangImg,
+  "Banana": bananaImg, // <-- Kunci "Banana" sesuai database
   "Apel": apelImg,
   "Tomat": tomatImg,
   "Semangka": semangkaImg,
@@ -105,9 +106,9 @@ function Order({ showNotification, db }) {
                 className="flex items-center gap-3 border-b border-gray-100 pb-2"
               >
                 <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
-                {/* GAMBAR KECIL DI KERANJANG */}
                 <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
                    <img 
+                    // Gunakan productImages untuk menampilkan gambar di keranjang
                     src={productImages[item.name] || logoAgromart} 
                     alt={item.name}
                     className="w-full h-full object-cover"
@@ -180,7 +181,6 @@ function Order({ showNotification, db }) {
                   key={product.id}
                   className="bg-white p-4 rounded-xl shadow-soft text-center flex flex-col items-center"
                 >
-                  {/* GAMBAR PRODUK DI GRID */}
                   <div className="h-24 w-full mb-2 bg-white rounded-lg overflow-hidden flex items-center justify-center">
                     <img 
                       src={productImages[product.name] || logoAgromart} 
