@@ -2,6 +2,35 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../services/database";
 
+// 1. IMPORT GAMBAR ASET LOKAL (Sama seperti di Order.jsx)
+import bananaImg from "../../assets/buah_banana.jpg";
+import apelImg from "../../assets/apel.jpg";
+import tomatImg from "../../assets/buah_tomat.jpg";
+import semangkaImg from "../../assets/semangka.jpg";
+import wortelImg from "../../assets/wortel.jpg";
+import nanasImg from "../../assets/nanas.jpg";
+import cabeMerahImg from "../../assets/cabe_merah.jpg";
+import cabeHijauImg from "../../assets/cabe_hijau.jpg";
+import anggurImg from "../../assets/anggur.jpg";
+import jerukImg from "../../assets/jeruk.jpg";
+import buncisImg from "../../assets/buncis.jpg";
+import logoAgromart from "../../assets/logo_agromart.png"; 
+
+// 2. MAPPING GAMBAR
+const productImages = {
+  "Banana": bananaImg,
+  "Apel": apelImg,
+  "Tomat": tomatImg,
+  "Semangka": semangkaImg,
+  "Wortel": wortelImg,
+  "Nanas": nanasImg,
+  "Cabe Merah": cabeMerahImg,
+  "Cabe Hijau": cabeHijauImg,
+  "Anggur": anggurImg,
+  "Jeruk": jerukImg,
+  "Buncis": buncisImg,
+};
+
 function Payment({ showNotification, db: database }) {
   const [cart, setCart] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState("gopay");
@@ -64,10 +93,17 @@ function Payment({ showNotification, db: database }) {
   return (
     <section className="container mx-auto p-6 flex items-center justify-center min-h-[80vh]">
       <div className="bg-gray-100 rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-col md:flex-row relative min-h-[500px]">
+        
+        {/* BAGIAN KIRI (TOTAL & TOMBOL BAYAR) */}
         <div className="bg-white border-4 border-blue-400 p-6 w-full md:w-1/3 flex flex-col items-center justify-center text-center relative z-10">
           <h2 className="font-serif text-xl mb-6">PEMBAYARAN</h2>
           <div className="w-40 h-40 rounded-full border-2 border-agro-green bg-white mb-8 overflow-hidden flex items-center justify-center">
-            <i className="fas fa-leaf text-6xl text-agro-green"></i>
+             {/* Ganti ikon daun dengan logo */}
+             <img 
+                src={logoAgromart} 
+                alt="Logo" 
+                className="w-full h-full object-cover" 
+             />
           </div>
           <div className="mb-4">
             <div className="text-gray-400 text-lg">total</div>
@@ -83,6 +119,7 @@ function Payment({ showNotification, db: database }) {
           </button>
         </div>
 
+        {/* BAGIAN TENGAH (DAFTAR PESANAN) */}
         <div className="p-6 w-full md:w-1/3 flex flex-col">
           <div className="text-right mb-4">
             <span className="text-sm font-bold">
@@ -101,9 +138,16 @@ function Payment({ showNotification, db: database }) {
               cart.map((item, index) => (
                 <div key={item.productId} className="flex items-center gap-2">
                   <span>{index + 1}.</span>
-                  <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
-                    <i className="fas fa-apple-alt text-sm text-agro-green"></i>
+                  {/* --- UPDATE: TAMPILKAN GAMBAR PRODUK --- */}
+                  <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                    <img 
+                      src={item.image || productImages[item.name] || logoAgromart} 
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {e.target.src = logoAgromart}}
+                    />
                   </div>
+                  {/* --------------------------------------- */}
                   <div className="flex-grow">
                     <div className="font-bold">{item.name}</div>
                     <div className="text-[10px] text-gray-500">
@@ -136,6 +180,7 @@ function Payment({ showNotification, db: database }) {
           </div>
         </div>
 
+        {/* BAGIAN KANAN (METODE PEMBAYARAN) */}
         <div className="bg-white rounded-l-[3rem] p-6 w-full md:w-1/3 flex flex-col items-center justify-center shadow-[-10px_0_20px_rgba(0,0,0,0.05)] relative md:-ml-4">
           <h3 className="text-gray-500 text-sm mb-6">Metode pembayaran</h3>
           <div className="space-y-4 w-full px-8">
