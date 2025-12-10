@@ -15,7 +15,8 @@ import Login from "./components/pages/Login";
 import Register from "./components/pages/Register";
 import Contact from "./components/pages/Contact";
 import Payment from "./components/pages/Payment";
-import { db } from "./services/database"; // IMPORT db dari sini
+import AdminDashboard from "./components/pages/AdminDashboard"; 
+import { db } from "./services/database";
 
 function AppContent() {
   const [showAnimation, setShowAnimation] = useState(true);
@@ -77,13 +78,12 @@ function AppContent() {
           <Routes location={location}>
             <Route path="/" element={<Home />} />
 
-            {/* PASS db sebagai prop ke Product */}
             <Route
               path="/products"
               element={
                 <Product
                   showNotification={showNotification}
-                  db={db} // INI PENTING!
+                  db={db}
                 />
               }
             />
@@ -93,9 +93,15 @@ function AppContent() {
               element={
                 <Order
                   showNotification={showNotification}
-                  db={db} // INI JUGA
+                  db={db}
                 />
               }
+            />
+
+            {/* ROUTE ADMIN (WAJIB ADA) */}
+            <Route
+              path="/admin"
+              element={<AdminDashboard showNotification={showNotification} />}
             />
 
             <Route
@@ -128,7 +134,7 @@ function AppContent() {
               element={
                 <Payment
                   showNotification={showNotification}
-                  db={db} // DAN INI
+                  db={db}
                 />
               }
             />
