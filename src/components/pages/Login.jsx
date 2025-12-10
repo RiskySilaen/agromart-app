@@ -25,9 +25,18 @@ function Login({ showNotification, updateUser }) {
     if (result.success) {
       showNotification(`Selamat datang, ${result.user.name}!`);
       updateUser();
+      
+      // === BAGIAN INI DIMODIFIKASI UNTUK CEK ROLE ===
       setTimeout(() => {
-        navigate("/");
+        // Cek apakah user memiliki role 'admin'
+        if (result.user.role === 'admin') {
+          navigate("/admin"); // Jika admin, arahkan ke Dashboard Admin
+        } else {
+          navigate("/");      // Jika user biasa, arahkan ke Home
+        }
       }, 1500);
+      // ===============================================
+
     } else {
       showNotification(result.message, "error");
     }

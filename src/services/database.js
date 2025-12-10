@@ -11,6 +11,29 @@ class AgroMartDB {
     }
   }
 
+  // --- ADMIN: TAMBAH PRODUK (BARU) ---
+  // Fungsi ini dipanggil oleh AdminDashboard.jsx untuk mengirim data ke backend
+  async addProduct(productData) {
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData),
+      });
+      
+      // Cek jika server merespons error (misal 400 atau 500)
+      if (!res.ok) {
+         const errorData = await res.json();
+         throw new Error(errorData.message || 'Gagal menambah produk');
+      }
+
+      return await res.json();
+    } catch (error) {
+      console.error("Gagal tambah produk:", error);
+      return { success: false, message: error.message || "Error koneksi" };
+    }
+  }
+
   // --- AUTH (Fetch dari API) ---
   async registerUser(name, email, phone, password) {
     try {

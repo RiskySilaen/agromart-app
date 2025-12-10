@@ -14,6 +14,7 @@ model User {
   email     String   @unique
   phone     String
   password  String
+  role      String   @default("user")
   createdAt DateTime @default(now())
 }
 
@@ -24,6 +25,7 @@ model Product {
   rating   Float
   category String
   stock    Int
+  image    String? // <--- Tambahkan ini (tanda tanya artinya boleh kosong)
 }
 
 model Contact {
