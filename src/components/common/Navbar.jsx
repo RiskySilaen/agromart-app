@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-// Hapus 'showNotification' dan 'useLocation' karena tidak dipakai
 function Navbar({ currentUser, onLogout }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -38,13 +37,24 @@ function Navbar({ currentUser, onLogout }) {
         </div>
 
         {/* BAGIAN TENGAH (DESKTOP) */}
-        <div className="hidden md:flex space-x-10 font-serif text-sm tracking-widest">
+        <div className="hidden md:flex space-x-10 font-serif text-sm tracking-widest items-center">
           <Link to="/contact" className="hover:underline underline-offset-4 uppercase">KONTAK</Link>
           <Link to="/products" className="hover:underline underline-offset-4 uppercase">PRODUK</Link>
           <Link to="/order" className="hover:underline underline-offset-4 uppercase">ORDER</Link>
 
           {currentUser ? (
             <>
+              {/* --- LINK DASHBOARD KHUSUS ADMIN --- */}
+              {currentUser.role === 'admin' && (
+                <Link 
+                  to="/admin" 
+                  className="text-yellow-300 hover:text-yellow-100 font-bold uppercase border border-yellow-300 px-3 py-1 rounded transition"
+                >
+                  DASHBOARD
+                </Link>
+              )}
+              {/* ----------------------------------- */}
+
               <span className="text-green-300">Hi, {currentUser.name}</span>
               <button onClick={handleLogout} className="hover:underline underline-offset-4 uppercase text-red-300">LOGOUT</button>
             </>
@@ -56,7 +66,6 @@ function Navbar({ currentUser, onLogout }) {
         {/* BAGIAN KANAN (TOMBOL MENU HP) */}
         <div className="md:hidden">
           <button onClick={toggleMenu} className="focus:outline-none">
-            {/* Menggunakan fa-times yang lebih umum untuk tanda silang */}
             <i className={`fa-solid ${isMenuOpen ? "fa-times" : "fa-bars"} text-2xl`}></i>
           </button>
         </div>
@@ -71,6 +80,18 @@ function Navbar({ currentUser, onLogout }) {
 
           {currentUser ? (
             <>
+              {/* --- LINK DASHBOARD MOBILE --- */}
+              {currentUser.role === 'admin' && (
+                <Link 
+                  to="/admin" 
+                  onClick={closeMenu}
+                  className="text-yellow-300 hover:text-yellow-100 font-bold uppercase w-full text-center py-3 border-t border-green-600"
+                >
+                  DASHBOARD ADMIN
+                </Link>
+              )}
+              {/* ----------------------------- */}
+
               <span className="text-green-300 py-3 border-t border-green-600 w-full text-center mt-2">Hi, {currentUser.name}</span>
               <button onClick={handleLogout} className="text-red-300 hover:text-red-100 py-3 w-full text-center">LOGOUT</button>
             </>
