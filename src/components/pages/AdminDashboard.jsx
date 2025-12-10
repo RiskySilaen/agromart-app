@@ -6,9 +6,9 @@ function AdminDashboard({ showNotification }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("add");
-  const [uploading, setUploading] = useState(false); // State untuk loading upload
+  const [uploading, setUploading] = useState(false); // Loading upload
   
-  // State untuk Form Produk
+  // State Data Formulir
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -19,7 +19,7 @@ function AdminDashboard({ showNotification }) {
 
   useEffect(() => {
     const currentUser = db.getCurrentUser();
-    // Cek keamanan: hanya admin yang boleh masuk
+    // Cek keamanan: tendang jika bukan admin
     if (!currentUser || currentUser.role !== 'admin') {
       navigate("/");
       return;
@@ -31,7 +31,7 @@ function AdminDashboard({ showNotification }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // --- FUNGSI UPLOAD KE CLOUDINARY ---
+  // --- FUNGSI UPLOAD GAMBAR KE CLOUDINARY ANDA ---
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -41,14 +41,10 @@ function AdminDashboard({ showNotification }) {
 
     const data = new FormData();
     data.append("file", file);
-    
-    // --- GANTI DUA BARIS INI DENGAN DATA CLOUDINARY ANDA ---
-    data.append("upload_preset", "agromart_preset"); // Ganti dengan nama upload preset Anda
-    data.append("cloud_name", "dfewl6y52");      // Ganti dengan Cloud Name Anda
-    // -------------------------------------------------------
+    data.append("upload_preset", "agromart_preset"); // Preset Anda
+    data.append("cloud_name", "dfewl6y52");          // Cloud Name Anda
 
     try {
-      // --- GANTI JUGA 'dxyz12345' DI URL INI DENGAN CLOUD NAME ANDA ---
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dfewl6y52/image/upload", 
         {
@@ -60,15 +56,15 @@ function AdminDashboard({ showNotification }) {
       const uploadedImage = await res.json();
       
       if (uploadedImage.secure_url) {
+        // Simpan URL gambar dari Cloudinary ke state form
         setFormData({ ...formData, image: uploadedImage.secure_url });
         showNotification("Gambar berhasil diupload!");
       } else {
-        console.error("Upload failed:", uploadedImage);
         throw new Error("Gagal mendapatkan URL gambar");
       }
     } catch (error) {
       console.error("Upload error:", error);
-      showNotification("Gagal upload gambar. Cek koneksi atau setting Cloudinary.", "error");
+      showNotification("Gagal upload gambar", "error");
     } finally {
       setUploading(false);
     }
@@ -83,12 +79,12 @@ function AdminDashboard({ showNotification }) {
     
     showNotification("Sedang menyimpan...", "info");
     
-    // Kirim data ke database (lewat service database.js)
+    // Simpan ke Database
     const result = await db.addProduct(formData);
 
     if (result.success) {
       showNotification("Produk berhasil ditambahkan!");
-      // Reset form setelah sukses
+      // Reset formulir
       setFormData({
         name: "",
         price: "",
@@ -96,7 +92,7 @@ function AdminDashboard({ showNotification }) {
         stock: "",
         image: "",
       });
-      // Reset input file secara manual
+      // Reset input file
       const fileInput = document.getElementById("fileInput");
       if(fileInput) fileInput.value = "";
     } else {
@@ -108,7 +104,7 @@ function AdminDashboard({ showNotification }) {
     <section className="container mx-auto p-6 min-h-[80vh]">
       <div className="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-agro-green">
         
-        {/* HEADER DASHBOARD */}
+        {/* Header Dashboard */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="font-serif text-3xl text-gray-800">Dashboard Admin</h1>
@@ -119,23 +115,18 @@ function AdminDashboard({ showNotification }) {
           </button>
         </div>
 
-        {/* TAB MENU (Bisa dikembangkan nanti untuk fitur Edit/Delete) */}
         <div className="flex gap-4 mb-8 border-b">
-          <button 
-            onClick={() => setActiveTab("add")}
-            className={`pb-2 px-4 ${activeTab === 'add' ? 'border-b-2 border-agro-green font-bold text-agro-green' : 'text-gray-500'}`}
-          >
+          <button className="pb-2 px-4 border-b-2 border-agro-green font-bold text-agro-green">
             + Tambah Produk
           </button>
         </div>
 
-        {/* FORM TAMBAH PRODUK */}
-        {activeTab === "add" && (
-          <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-xl border border-gray-200">
+        {/* --- FORMULIR INPUT --- */}
+        <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-xl border border-gray-200">
             <h2 className="font-bold text-xl mb-4 text-gray-700">Input Data Sayur/Buah</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Baris 1: Nama & Kategori */}
+              {/* Nama & Kategori */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Nama Produk</label>
@@ -163,7 +154,7 @@ function AdminDashboard({ showNotification }) {
                 </div>
               </div>
 
-              {/* Baris 2: Harga & Stok */}
+              {/* Harga & Stok */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Harga (Rp)</label>
@@ -191,11 +182,10 @@ function AdminDashboard({ showNotification }) {
                 </div>
               </div>
 
-              {/* Baris 3: Upload Foto */}
+              {/* Upload Foto */}
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Upload Foto Produk</label>
-                <div className="flex flex-col gap-2">
-                    <input
+                <input
                     id="fileInput"
                     type="file"
                     accept="image/*"
@@ -207,14 +197,7 @@ function AdminDashboard({ showNotification }) {
                         file:bg-green-50 file:text-agro-green
                         hover:file:bg-green-100
                     "
-                    />
-                    {/* Input URL manual sebagai cadangan (hidden/opsional) */}
-                    <input 
-                        type="hidden" 
-                        name="image" 
-                        value={formData.image} 
-                    />
-                </div>
+                />
                 {uploading && <p className="text-xs text-blue-500 mt-1 animate-pulse">Sedang mengupload ke Cloudinary...</p>}
               </div>
 
@@ -235,8 +218,7 @@ function AdminDashboard({ showNotification }) {
                 {uploading ? "Tunggu Upload..." : "Simpan Produk"}
               </button>
             </form>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

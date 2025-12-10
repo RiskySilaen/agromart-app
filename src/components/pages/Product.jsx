@@ -6,7 +6,7 @@ import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/buah_tomat.jpg";
 import semangkaImg from "../../assets/semangka.jpg";
 import wortelImg from "../../assets/wortel.jpg";
-import nanasImg from "../../assets/nanas.jpg"; // Sudah ada gambarnya sekarang
+import nanasImg from "../../assets/nanas.jpg";
 import cabeMerahImg from "../../assets/cabe_merah.jpg";
 import cabeHijauImg from "../../assets/cabe_hijau.jpg";
 import anggurImg from "../../assets/anggur.jpg";
@@ -103,10 +103,12 @@ function Product({ showNotification, db }) {
                 className="bg-white p-3 rounded-2xl shadow-soft flex flex-col items-center text-center cursor-pointer hover:scale-105 transition"
               >
                 <div className="h-28 w-full mb-2 bg-white rounded-xl overflow-hidden flex items-center justify-center">
+                  {/* UPDATE: Prioritaskan gambar dari database (URL Cloudinary) */}
                   <img 
-                    src={productImages[product.name] || logoAgromart} 
+                    src={product.image || productImages[product.name] || logoAgromart} 
                     alt={product.name}
                     className="w-full h-full object-contain"
+                    onError={(e) => {e.target.src = logoAgromart}} // Fallback jika gambar rusak
                   />
                 </div>
                 
