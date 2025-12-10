@@ -15,7 +15,7 @@ import buncisImg from "../../assets/buncis.jpg";
 
 // Mapping Nama Produk ke File Gambar
 const productImages = {
-  "Banana":buah_bananaImg,
+  "Banana": bananaImg,
   "Apel": apelImg,
   "Tomat": tomatImg,
   "Semangka": semangkaImg,

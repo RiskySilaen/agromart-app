@@ -17,7 +17,7 @@ import logoAgromart from "../../assets/logo_agromart.png";
 
 // 2. MAPPING GAMBAR
 const productImages = {
-  "Banana":buah_bananaImg, // <-- Kunci "Banana" sesuai database
+  "Banana": bananaImg, // <-- Kunci "Banana" sesuai database
   "Apel": apelImg,
   "Tomat": tomatImg,
   "Semangka": semangkaImg,
