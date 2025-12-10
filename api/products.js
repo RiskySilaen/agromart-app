@@ -1,12 +1,11 @@
-// api/products.js
 import prisma from './prisma.js';
 
 export default async function handler(req, res) {
-  // 1. JIKA METODE GET (Ambil Data)
+  // 1. GET: Ambil Semua Data
   if (req.method === 'GET') {
     try {
       const products = await prisma.product.findMany({
-        orderBy: { id: 'desc' } // Urutkan dari yang terbaru
+        orderBy: { id: 'desc' }
       });
       return res.status(200).json(products);
     } catch (error) {
@@ -14,12 +13,10 @@ export default async function handler(req, res) {
     }
   }
 
-  // 2. JIKA METODE POST (Tambah Data)
+  // 2. POST: Tambah Data Baru
   if (req.method === 'POST') {
     try {
       const { name, price, category, stock, image } = req.body;
-
-      // Validasi sederhana
       if (!name || !price || !category) {
         return res.status(400).json({ success: false, message: 'Data tidak lengkap' });
       }
@@ -27,18 +24,37 @@ export default async function handler(req, res) {
       const newProduct = await prisma.product.create({
         data: {
           name,
-          price: parseFloat(price), // Pastikan jadi angka
+          price: parseFloat(price),
           category,
-          stock: parseInt(stock),   // Pastikan jadi angka
-          rating: 4.5,              // Default rating
-          image: image || "",       // Simpan URL gambar
+          stock: parseInt(stock),
+          rating: 4.5,
+          image: image || "",
         },
       });
 
       return res.status(201).json({ success: true, product: newProduct });
     } catch (error) {
-      console.error("Error create product:", error);
       return res.status(500).json({ success: false, message: 'Gagal menambah produk' });
+    }
+  }
+
+  // 3. DELETE: Hapus Data (BARU)
+  if (req.method === 'DELETE') {
+    try {
+      const { id } = req.body; // Ambil ID dari data yang dikirim
+      
+      if (!id) {
+        return res.status(400).json({ success: false, message: 'ID produk diperlukan' });
+      }
+
+      await prisma.product.delete({
+        where: { id: Number(id) },
+      });
+
+      return res.status(200).json({ success: true, message: 'Produk dihapus' });
+    } catch (error) {
+      console.error("Delete error:", error);
+      return res.status(500).json({ success: false, message: 'Gagal menghapus produk' });
     }
   }
 

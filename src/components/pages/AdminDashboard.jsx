@@ -5,10 +5,11 @@ import { db } from "../../services/database";
 function AdminDashboard({ showNotification }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("add");
-  const [uploading, setUploading] = useState(false); // Loading upload
+  const [activeTab, setActiveTab] = useState("add"); // 'add' atau 'list'
+  const [uploading, setUploading] = useState(false);
+  const [products, setProducts] = useState([]); // State untuk menyimpan daftar produk
   
-  // State Data Formulir
+  // State Form Input
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -19,19 +20,24 @@ function AdminDashboard({ showNotification }) {
 
   useEffect(() => {
     const currentUser = db.getCurrentUser();
-    // Cek keamanan: tendang jika bukan admin
     if (!currentUser || currentUser.role !== 'admin') {
       navigate("/");
       return;
     }
     setUser(currentUser);
+    loadProducts(); // Load produk saat pertama kali buka
   }, []);
+
+  // Fungsi Load Produk dari Database
+  const loadProducts = async () => {
+    const data = await db.getProducts();
+    setProducts(data);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // --- FUNGSI UPLOAD GAMBAR KE CLOUDINARY ANDA ---
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -41,29 +47,23 @@ function AdminDashboard({ showNotification }) {
 
     const data = new FormData();
     data.append("file", file);
-    data.append("upload_preset", "agromart_preset"); // Preset Anda
-    data.append("cloud_name", "dfewl6y52");          // Cloud Name Anda
+    data.append("upload_preset", "agromart_preset"); 
+    data.append("cloud_name", "dfewl6y52");          
 
     try {
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dfewl6y52/image/upload", 
-        {
-          method: "POST",
-          body: data,
-        }
+        { method: "POST", body: data }
       );
-
       const uploadedImage = await res.json();
       
       if (uploadedImage.secure_url) {
-        // Simpan URL gambar dari Cloudinary ke state form
         setFormData({ ...formData, image: uploadedImage.secure_url });
         showNotification("Gambar berhasil diupload!");
       } else {
-        throw new Error("Gagal mendapatkan URL gambar");
+        throw new Error("Gagal upload");
       }
     } catch (error) {
-      console.error("Upload error:", error);
       showNotification("Gagal upload gambar", "error");
     } finally {
       setUploading(false);
@@ -72,31 +72,32 @@ function AdminDashboard({ showNotification }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (uploading) {
-        showNotification("Tunggu upload gambar selesai", "warning");
-        return;
-    }
+    if (uploading) return;
     
     showNotification("Sedang menyimpan...", "info");
-    
-    // Simpan ke Database
     const result = await db.addProduct(formData);
 
     if (result.success) {
       showNotification("Produk berhasil ditambahkan!");
-      // Reset formulir
-      setFormData({
-        name: "",
-        price: "",
-        category: "buah",
-        stock: "",
-        image: "",
-      });
-      // Reset input file
+      setFormData({ name: "", price: "", category: "buah", stock: "", image: "" });
       const fileInput = document.getElementById("fileInput");
       if(fileInput) fileInput.value = "";
+      loadProducts(); // Refresh daftar produk
     } else {
       showNotification("Gagal: " + result.message, "error");
+    }
+  };
+
+  // --- FUNGSI HAPUS PRODUK (BARU) ---
+  const handleDelete = async (productId, productName) => {
+    if (window.confirm(`Yakin ingin menghapus ${productName}?`)) {
+      const result = await db.deleteProduct(productId);
+      if (result.success) {
+        showNotification("Produk dihapus");
+        loadProducts(); // Refresh list setelah hapus
+      } else {
+        showNotification("Gagal menghapus", "error");
+      }
     }
   };
 
@@ -104,7 +105,7 @@ function AdminDashboard({ showNotification }) {
     <section className="container mx-auto p-6 min-h-[80vh]">
       <div className="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-agro-green">
         
-        {/* Header Dashboard */}
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="font-serif text-3xl text-gray-800">Dashboard Admin</h1>
@@ -115,110 +116,112 @@ function AdminDashboard({ showNotification }) {
           </button>
         </div>
 
+        {/* Tab Menu */}
         <div className="flex gap-4 mb-8 border-b">
-          <button className="pb-2 px-4 border-b-2 border-agro-green font-bold text-agro-green">
+          <button 
+            onClick={() => setActiveTab("add")}
+            className={`pb-2 px-4 transition ${activeTab === 'add' ? 'border-b-2 border-agro-green font-bold text-agro-green' : 'text-gray-500 hover:text-agro-green'}`}
+          >
             + Tambah Produk
+          </button>
+          <button 
+            onClick={() => { setActiveTab("list"); loadProducts(); }}
+            className={`pb-2 px-4 transition ${activeTab === 'list' ? 'border-b-2 border-agro-green font-bold text-agro-green' : 'text-gray-500 hover:text-agro-green'}`}
+          >
+            Daftar Produk
           </button>
         </div>
 
-        {/* --- FORMULIR INPUT --- */}
-        <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-xl border border-gray-200">
+        {/* TAB 1: FORM TAMBAH */}
+        {activeTab === "add" && (
+          <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-xl border border-gray-200 animate-fade-in-up">
             <h2 className="font-bold text-xl mb-4 text-gray-700">Input Data Sayur/Buah</h2>
-            
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Nama & Kategori */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Nama Produk</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none"
-                    placeholder="Contoh: Apel Fuji"
-                    required
-                  />
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none" required />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Kategori</label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none bg-white"
-                  >
+                  <select name="category" value={formData.category} onChange={handleChange} className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none bg-white">
                     <option value="buah">Buah</option>
                     <option value="sayur">Sayur</option>
                   </select>
                 </div>
               </div>
-
-              {/* Harga & Stok */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Harga (Rp)</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none"
-                    placeholder="15000"
-                    required
-                  />
+                  <input type="number" name="price" value={formData.price} onChange={handleChange} className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none" required />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">Stok Awal</label>
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleChange}
-                    className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none"
-                    placeholder="50"
-                    required
-                  />
+                  <input type="number" name="stock" value={formData.stock} onChange={handleChange} className="w-full p-2 rounded border focus:ring-2 focus:ring-agro-green outline-none" required />
                 </div>
               </div>
-
-              {/* Upload Foto */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Upload Foto Produk</label>
-                <input
-                    id="fileInput"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="block w-full text-sm text-slate-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-full file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-green-50 file:text-agro-green
-                        hover:file:bg-green-100
-                    "
-                />
-                {uploading && <p className="text-xs text-blue-500 mt-1 animate-pulse">Sedang mengupload ke Cloudinary...</p>}
+                <label className="block text-sm text-gray-600 mb-1">Upload Foto</label>
+                <input id="fileInput" type="file" accept="image/*" onChange={handleImageUpload} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-agro-green hover:file:bg-green-100" />
+                {uploading && <p className="text-xs text-blue-500 mt-1">Sedang mengupload...</p>}
               </div>
-
-              {/* Preview Gambar */}
-              {formData.image && (
-                <div className="mt-2 flex flex-col items-center p-2 border border-dashed rounded-lg bg-gray-50">
-                  <p className="text-xs text-gray-400 mb-1">Preview Gambar:</p>
-                  <img src={formData.image} alt="Preview" className="h-32 object-contain rounded-lg bg-white shadow-sm" />
-                </div>
-              )}
-
-              {/* Tombol Simpan */}
-              <button
-                type="submit"
-                disabled={uploading}
-                className={`w-full text-white font-bold py-3 rounded-lg shadow-md transition mt-4 ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-agro-green hover:bg-green-700'}`}
-              >
-                {uploading ? "Tunggu Upload..." : "Simpan Produk"}
+              {formData.image && <img src={formData.image} alt="Preview" className="h-32 object-contain rounded-lg border bg-white mt-2" />}
+              <button type="submit" disabled={uploading} className={`w-full text-white font-bold py-3 rounded-lg shadow-md transition mt-4 ${uploading ? 'bg-gray-400' : 'bg-agro-green hover:bg-green-700'}`}>
+                {uploading ? "Tunggu..." : "Simpan Produk"}
               </button>
             </form>
-        </div>
+          </div>
+        )}
+
+        {/* TAB 2: DAFTAR PRODUK (TAMPILAN BARU) */}
+        {activeTab === "list" && (
+          <div className="overflow-x-auto animate-fade-in-up">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-green-50 text-gray-700 border-b border-green-200">
+                  <th className="p-4 font-semibold">Foto</th>
+                  <th className="p-4 font-semibold">Nama</th>
+                  <th className="p-4 font-semibold">Kategori</th>
+                  <th className="p-4 font-semibold">Harga</th>
+                  <th className="p-4 font-semibold">Stok</th>
+                  <th className="p-4 font-semibold text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="p-8 text-center text-gray-500">Belum ada produk.</td>
+                  </tr>
+                ) : (
+                  products.map((item) => (
+                    <tr key={item.id} className="border-b hover:bg-gray-50 transition">
+                      <td className="p-3">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} className="w-12 h-12 rounded object-cover border" />
+                        ) : (
+                          <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">No img</div>
+                        )}
+                      </td>
+                      <td className="p-3 font-medium">{item.name}</td>
+                      <td className="p-3 capitalize text-sm text-gray-600">{item.category}</td>
+                      <td className="p-3 text-sm">Rp {item.price.toLocaleString("id-ID")}</td>
+                      <td className="p-3 text-sm">{item.stock}</td>
+                      <td className="p-3 text-center">
+                        <button 
+                          onClick={() => handleDelete(item.id, item.name)}
+                          className="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded text-sm font-bold transition"
+                        >
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
       </div>
     </section>
   );

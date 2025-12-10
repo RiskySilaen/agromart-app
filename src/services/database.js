@@ -11,8 +11,7 @@ class AgroMartDB {
     }
   }
 
-  // --- ADMIN: TAMBAH PRODUK (BARU) ---
-  // Fungsi ini dipanggil oleh AdminDashboard.jsx untuk mengirim data ke backend
+  // --- ADMIN: TAMBAH PRODUK ---
   async addProduct(productData) {
     try {
       const res = await fetch('/api/products', {
@@ -21,7 +20,6 @@ class AgroMartDB {
         body: JSON.stringify(productData),
       });
       
-      // Cek jika server merespons error (misal 400 atau 500)
       if (!res.ok) {
          const errorData = await res.json();
          throw new Error(errorData.message || 'Gagal menambah produk');
@@ -30,6 +28,27 @@ class AgroMartDB {
       return await res.json();
     } catch (error) {
       console.error("Gagal tambah produk:", error);
+      return { success: false, message: error.message || "Error koneksi" };
+    }
+  }
+
+  // --- ADMIN: HAPUS PRODUK (BARU) ---
+  async deleteProduct(id) {
+    try {
+      const res = await fetch('/api/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Gagal menghapus produk');
+      }
+
+      return await res.json();
+    } catch (error) {
+      console.error("Gagal hapus produk:", error);
       return { success: false, message: error.message || "Error koneksi" };
     }
   }
@@ -74,7 +93,7 @@ class AgroMartDB {
     return JSON.parse(localStorage.getItem("agromart_cart")) || [];
   }
 
-  // Fungsi helper baru: Tambah ke cart dengan detail lengkap
+  // Fungsi helper: Tambah ke cart dengan detail lengkap
   addToCartWithDetails(product, quantity = 1) {
     const cart = this.getCart();
     const existingItem = cart.find((item) => item.productId === product.id);
@@ -88,13 +107,14 @@ class AgroMartDB {
         name: product.name,
         price: product.price,
         rating: product.rating,
+        image: product.image || "", // Simpan gambar agar muncul di keranjang
       });
     }
     localStorage.setItem("agromart_cart", JSON.stringify(cart));
     return true;
   }
 
-  // Fungsi lama tetap ada agar tidak error jika dipanggil
+  // Fungsi lama (fallback)
   addToCart(productId, quantity = 1) {
     return false; 
   }
@@ -164,7 +184,7 @@ class AgroMartDB {
     return { success: true, order: newOrder };
   }
   
-  // --- CONTACT (UPDATED: Fetch ke API) ---
+  // --- CONTACT ---
   async saveContact(name, email, phone, message) {
     try {
       const res = await fetch('/api/contact', {
