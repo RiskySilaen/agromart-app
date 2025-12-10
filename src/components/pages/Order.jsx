@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // 1. IMPORT GAMBAR (Pastikan banana.jpg sudah di-rename)
 import bananaImg from "../../assets/buah_banana.jpg";
 import apelImg from "../../assets/apel.jpg";
-import tomatImg from "../../assets/tomat.jpg";
+import tomatImg from "../../assets/buah_tomat.jpg";
 import semangkaImg from "../../assets/semangka.jpg";
 import wortelImg from "../../assets/wortel.jpg";
 import nanasImg from "../../assets/nanas.jpg";
