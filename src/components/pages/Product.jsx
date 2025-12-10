@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 // Import Logo & Gambar Produk
 import logoAgromart from "../../assets/logo_agromart.png";
-// import bananaImg from "../../assets/buah_banana.jpg"; // <--- MATIKAN BARIS INI
-const bananaImg = logoAgromart; // <--- GANTI JADI INI
+import bananaImg from "../../assets/buah_banana.jpg";
 import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/tomat.jpg";
 import semangkaImg from "../../assets/semangka.jpg";
