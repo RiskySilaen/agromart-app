@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// 1. IMPORT GAMBAR (Pastikan banana.jpg sudah di-rename)
+// 1. IMPORT GAMBAR ASET LOKAL (Sebagai cadangan)
 import bananaImg from "../../assets/buah_banana.jpg";
 import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/buah_tomat.jpg";
@@ -17,7 +17,7 @@ import logoAgromart from "../../assets/logo_agromart.png";
 
 // 2. MAPPING GAMBAR
 const productImages = {
-  "Banana": bananaImg, // <-- Kunci "Banana" sesuai database
+  "Banana": bananaImg,
   "Apel": apelImg,
   "Tomat": tomatImg,
   "Semangka": semangkaImg,
@@ -52,8 +52,7 @@ function Order({ showNotification, db }) {
   const updateCartQuantity = (productId, newQuantity) => {
     if (newQuantity < 0) newQuantity = 0;
     db.updateCartItem(productId, newQuantity);
-    showNotification("Keranjang diperbarui");
-    loadData();
+    loadData(); // Reload agar cart terupdate
   };
 
   const removeCartItem = (productId) => {
@@ -80,12 +79,30 @@ function Order({ showNotification, db }) {
   };
 
   const handlePayment = () => {
+    // --- 1. CEK LOGIN (PROTEKSI GUEST) ---
+    const currentUser = db.getCurrentUser();
+    if (!currentUser) {
+      showNotification("Silakan Login atau Daftar untuk melanjutkan pembelian", "error");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+      return;
+    }
+    // -------------------------------------
+
     if (cart.length === 0) {
       showNotification("Keranjang belanja kosong", "error");
       return;
     }
     navigate("/payment");
   };
+
+  // Helper untuk menambah ke cart (tombol plus)
+  const handleAddToCart = (product) => {
+     db.addToCartWithDetails(product, 1);
+     loadData();
+     showNotification("Masuk keranjang");
+  }
 
   return (
     <section className="container mx-auto p-6 flex flex-col md:flex-row gap-8">
@@ -106,33 +123,33 @@ function Order({ showNotification, db }) {
                 className="flex items-center gap-3 border-b border-gray-100 pb-2"
               >
                 <span className="text-xs text-gray-500 w-4">{index + 1}.</span>
-                <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 rounded bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                   {/* Menampilkan gambar item di keranjang (Cloudinary atau Lokal) */}
                    <img 
-                    // Gunakan productImages untuk menampilkan gambar di keranjang
-                    src={productImages[item.name] || logoAgromart} 
+                    src={item.image || productImages[item.name] || logoAgromart} 
                     alt={item.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {e.target.src = logoAgromart}}
                   />
                 </div>
                 <div className="flex-grow">
                   <div className="text-sm font-bold">{item.name}</div>
-                  <div className="text-[10px] text-yellow-500">
-                    <i className="fa-solid fa-star"></i> {item.rating}
-                  </div>
                   <div className="text-[10px] text-gray-500">
                     Rp {item.price.toLocaleString("id-ID")}
                   </div>
                   <div className="text-[10px] text-gray-500">
-                    Rp {(item.price * item.quantity).toLocaleString("id-ID")}
+                    Total: Rp {(item.price * item.quantity).toLocaleString("id-ID")}
                   </div>
                 </div>
-                <div className="text-sm font-bold">x {item.quantity}</div>
-                <button
-                  onClick={() => removeCartItem(item.productId)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <i className="fas fa-trash text-xs"></i>
-                </button>
+                <div className="flex flex-col items-center gap-1">
+                    <div className="text-xs font-bold">x{item.quantity}</div>
+                    <button
+                    onClick={() => removeCartItem(item.productId)}
+                    className="text-red-500 hover:text-red-700"
+                    >
+                    <i className="fas fa-trash text-xs"></i>
+                    </button>
+                </div>
               </div>
             ))
           )}
@@ -179,36 +196,40 @@ function Order({ showNotification, db }) {
               return (
                 <div
                   key={product.id}
-                  className="bg-white p-4 rounded-xl shadow-soft text-center flex flex-col items-center"
+                  className="bg-white p-4 rounded-xl shadow-soft text-center flex flex-col items-center h-full justify-between"
                 >
-                  <div className="h-24 w-full mb-2 bg-white rounded-lg overflow-hidden flex items-center justify-center">
-                    <img 
-                      src={productImages[product.name] || logoAgromart} 
-                      alt={product.name}
-                      className="w-full h-full object-contain"
-                    />
+                  <div className="w-full">
+                    <div className="h-24 w-full mb-2 bg-white rounded-lg overflow-hidden flex items-center justify-center">
+                        {/* Menampilkan gambar produk di grid (Cloudinary atau Lokal) */}
+                        <img 
+                        src={product.image || productImages[product.name] || logoAgromart} 
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {e.target.src = logoAgromart}}
+                        />
+                    </div>
+                    <div className="text-yellow-400 text-xs mb-1">
+                        <i className="fa-solid fa-star"></i> {product.rating}
+                    </div>
+                    <h3 className="font-bold text-sm line-clamp-1">{product.name}</h3>
+                    <p className="text-xs text-gray-500 mb-3">
+                        Rp {product.price.toLocaleString("id-ID")} / pack
+                    </p>
                   </div>
-                  <div className="text-yellow-400 text-xs mb-1">
-                    <i className="fa-solid fa-star"></i> {product.rating}
-                  </div>
-                  <h3 className="font-bold text-sm">{product.name}</h3>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Rp {product.price.toLocaleString("id-ID")} / pack
-                  </p>
-                  <div className="flex items-center justify-center gap-3 bg-gray-200 rounded-full px-2 py-1">
+                  
+                  <div className="flex items-center justify-center gap-3 bg-gray-200 rounded-full px-2 py-1 mt-2">
                     <button
                       onClick={() =>
                         updateCartQuantity(product.id, quantity - 1)
                       }
-                      className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-600 shadow-sm"
+                      className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-gray-600 shadow-sm disabled:opacity-50"
+                      disabled={quantity === 0}
                     >
                       <i className="fa-solid fa-minus text-xs"></i>
                     </button>
                     <span className="text-xs font-bold w-4">{quantity}</span>
                     <button
-                      onClick={() =>
-                        updateCartQuantity(product.id, quantity + 1)
-                      }
+                      onClick={() => handleAddToCart(product)}
                       className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shadow-sm"
                     >
                       <i className="fa-solid fa-plus text-xs"></i>

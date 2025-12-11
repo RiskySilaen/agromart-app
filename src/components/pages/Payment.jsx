@@ -38,8 +38,17 @@ function Payment({ showNotification, db: database }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const cartItems = database.getCart();
     const user = database.getCurrentUser();
+
+    // --- PROTEKSI HALAMAN: CEK LOGIN ---
+    if (!user) {
+      showNotification("Anda harus login untuk mengakses halaman ini", "error");
+      navigate("/login");
+      return;
+    }
+    // -----------------------------------
+
+    const cartItems = database.getCart();
     setCart(cartItems);
     setCurrentUser(user);
   }, []);
