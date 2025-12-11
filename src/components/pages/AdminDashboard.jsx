@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../services/database";
+// 1. IMPORT MODAL YANG SUDAH ANDA BUAT
+import ConfirmationModal from "../common/ConfirmationModal"; 
 
 function AdminDashboard({ showNotification }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("add"); // 'add' atau 'list'
+  const [activeTab, setActiveTab] = useState("add");
   const [uploading, setUploading] = useState(false);
-  const [products, setProducts] = useState([]); // State untuk menyimpan daftar produk
+  const [products, setProducts] = useState([]);
   
-  // State Form Input
+  // 2. STATE UNTUK MENGATUR MODAL (BUKA/TUTUP)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+
+  // State Form
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -25,10 +31,9 @@ function AdminDashboard({ showNotification }) {
       return;
     }
     setUser(currentUser);
-    loadProducts(); // Load produk saat pertama kali buka
+    loadProducts();
   }, []);
 
-  // Fungsi Load Produk dari Database
   const loadProducts = async () => {
     const data = await db.getProducts();
     setProducts(data);
@@ -82,23 +87,33 @@ function AdminDashboard({ showNotification }) {
       setFormData({ name: "", price: "", category: "buah", stock: "", image: "" });
       const fileInput = document.getElementById("fileInput");
       if(fileInput) fileInput.value = "";
-      loadProducts(); // Refresh daftar produk
+      loadProducts();
     } else {
       showNotification("Gagal: " + result.message, "error");
     }
   };
 
-  // --- FUNGSI HAPUS PRODUK (BARU) ---
-  const handleDelete = async (productId, productName) => {
-    if (window.confirm(`Yakin ingin menghapus ${productName}?`)) {
-      const result = await db.deleteProduct(productId);
-      if (result.success) {
-        showNotification("Produk dihapus");
-        loadProducts(); // Refresh list setelah hapus
-      } else {
-        showNotification("Gagal menghapus", "error");
-      }
+  // 3. FUNGSI BARU: BUKA MODAL SAAT KLIK HAPUS
+  // (Menggantikan window.confirm)
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product); // Simpan dulu produk mana yang mau dihapus
+    setIsModalOpen(true);        // Tampilkan modal
+  };
+
+  // 4. FUNGSI BARU: EKSEKUSI HAPUS (DIPANGGIL OLEH MODAL)
+  const executeDelete = async () => {
+    if (!productToDelete) return;
+
+    const result = await db.deleteProduct(productToDelete.id);
+    if (result.success) {
+      showNotification("Produk berhasil dihapus");
+      loadProducts();
+    } else {
+      showNotification("Gagal menghapus", "error");
     }
+    // Tutup modal & bersihkan data
+    setIsModalOpen(false);
+    setProductToDelete(null);
   };
 
   return (
@@ -132,9 +147,10 @@ function AdminDashboard({ showNotification }) {
           </button>
         </div>
 
-        {/* TAB 1: FORM TAMBAH */}
+        {/* FORM TAMBAH */}
         {activeTab === "add" && (
           <div className="max-w-2xl mx-auto bg-gray-50 p-6 rounded-xl border border-gray-200 animate-fade-in-up">
+            {/* ... Form input sama seperti sebelumnya ... */}
             <h2 className="font-bold text-xl mb-4 text-gray-700">Input Data Sayur/Buah</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -173,7 +189,7 @@ function AdminDashboard({ showNotification }) {
           </div>
         )}
 
-        {/* TAB 2: DAFTAR PRODUK (TAMPILAN BARU) */}
+        {/* DAFTAR PRODUK */}
         {activeTab === "list" && (
           <div className="overflow-x-auto animate-fade-in-up">
             <table className="w-full text-left border-collapse">
@@ -207,8 +223,9 @@ function AdminDashboard({ showNotification }) {
                       <td className="p-3 text-sm">Rp {item.price.toLocaleString("id-ID")}</td>
                       <td className="p-3 text-sm">{item.stock}</td>
                       <td className="p-3 text-center">
+                        {/* 5. GANTI ONCLICK DI SINI */}
                         <button 
-                          onClick={() => handleDelete(item.id, item.name)}
+                          onClick={() => handleDeleteClick(item)} // Panggil fungsi buka modal
                           className="bg-red-100 hover:bg-red-200 text-red-600 px-3 py-1 rounded text-sm font-bold transition"
                         >
                           Hapus
@@ -221,6 +238,17 @@ function AdminDashboard({ showNotification }) {
             </table>
           </div>
         )}
+
+        {/* 6. PASANG KOMPONEN MODAL DI SINI (INVISIBLE SAMPAI ISOPEN=TRUE) */}
+        <ConfirmationModal 
+          isOpen={isModalOpen}
+          title="Hapus Produk?"
+          message={`Apakah Anda yakin ingin menghapus "${productToDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+          confirmText="Ya, Hapus"
+          cancelText="Batal"
+          onConfirm={executeDelete}
+          onCancel={() => setIsModalOpen(false)}
+        />
 
       </div>
     </section>
