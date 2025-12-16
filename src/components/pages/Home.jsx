@@ -1,15 +1,35 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+// 1. IMPORT DATABASE (PENTING UTK CEK LOGIN)
+import { db } from "../../services/database";
+
 // Pastikan file gambar ini ada di folder assets
 import heroImg from "../../assets/logo_agromart.png";
 
-function Home() {
+// 2. TERIMA PROPS showNotification
+function Home({ showNotification }) {
   const navigate = useNavigate();
 
   const handleJoinPartner = () => {
-    const phoneNumber = "6282199690715"; // Ganti dengan nomor WA Anda
-    const message = "Halo Admin Agromart, saya petani dan ingin menjual hasil panen saya di aplikasi ini. Bagaimana caranya?";
+    // 3. LOGIKA CEK LOGIN
+    const user = db.getCurrentUser();
+
+    if (!user) {
+      // Jika belum login, munculkan notifikasi merah dan lempar ke halaman Login
+      if (showNotification) {
+        showNotification("Silakan Login atau Daftar terlebih dahulu untuk menghubungi Admin", "error");
+      }
+      navigate("/login");
+      return; // Stop, jangan lanjut ke WA
+    }
+
+    // --- JIKA SUDAH LOGIN, BARU BUKA WA ---
+    const phoneNumber = "6282199690715"; // Nomor Anda
+    
+    // Pesan lebih personal dengan nama user
+    const message = `Halo Admin Agromart, saya ${user.name} (Petani) dan ingin menjual hasil panen saya di aplikasi ini. Bagaimana caranya?`;
+    
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
   };
@@ -42,15 +62,13 @@ function Home() {
             </button>
           </div>
 
-          {/* --- PERBAIKAN GAMBAR HERO --- */}
+          {/* --- GAMBAR HERO --- */}
           <div className="z-10 relative">
             {/* Lingkaran Putih sebagai bingkai */}
             <div className="w-72 h-72 md:w-96 md:h-96 bg-white rounded-full flex items-center justify-center shadow-2xl overflow-hidden border-8 border-white/20">
                <img 
                 src={heroImg} 
                 alt="Sayuran Segar" 
-                // object-cover: Memaksa gambar mengisi penuh lingkaran (memotong sudut putih)
-                // scale-100: Memastikan gambar tidak miring/terputar
                 className="w-full h-full object-cover transform scale-110 hover:scale-125 transition duration-500"
                 onError={(e) => {
                     e.target.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2574&auto=format&fit=crop";
