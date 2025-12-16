@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 // Pastikan import gambar ini benar/ada di folder assets Anda
-import heroImg from "../../assets/hero_vege.jpg"; 
+import heroImg from "../../assets/Hero_Vege.png"; 
 
 function Home() {
   const navigate = useNavigate();
