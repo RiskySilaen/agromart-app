@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-// --- PASTIKAN FILE GAMBAR INI ADA ---
+// Pastikan file gambar ini ada di folder assets
 import heroImg from "../../assets/Hero_Vege.png";
 
 function Home() {
   const navigate = useNavigate();
 
   const handleJoinPartner = () => {
-    const phoneNumber = "6281234567890"; // Ganti dengan nomor WA Admin Anda
+    const phoneNumber = "6281234567890"; // Ganti dengan nomor WA Anda
     const message = "Halo Admin Agromart, saya petani dan ingin menjual hasil panen saya di aplikasi ini. Bagaimana caranya?";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
@@ -17,11 +17,11 @@ function Home() {
   return (
     <div className="min-h-screen pb-20">
       
-      {/* 1. HERO SECTION (Bagian yang Diperbaiki) */}
+      {/* 1. HERO SECTION */}
       <section className="container mx-auto p-6 mt-4">
         <div className="bg-agro-green rounded-[3rem] p-8 md:p-16 flex flex-col md:flex-row items-center justify-between shadow-2xl relative overflow-hidden">
           
-          {/* Hiasan Latar Belakang (Blur) */}
+          {/* Hiasan Latar Belakang */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400 rounded-full blur-3xl opacity-20 -mr-20 -mt-20"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl opacity-10 -ml-20 -mb-20"></div>
 
@@ -42,22 +42,23 @@ function Home() {
             </button>
           </div>
 
-          {/* --- GAMBAR HERO (PERBAIKAN UTAMA) --- */}
+          {/* --- PERBAIKAN GAMBAR HERO --- */}
           <div className="z-10 relative">
-            {/* Kontainer Bulat yang Rapi */}
-            <div className="w-72 h-72 md:w-96 md:h-96 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center p-6 shadow-2xl animate-shape-morph overflow-hidden">
+            {/* Lingkaran Putih sebagai bingkai */}
+            <div className="w-72 h-72 md:w-96 md:h-96 bg-white rounded-full flex items-center justify-center shadow-2xl overflow-hidden border-8 border-white/20">
                <img 
                 src={heroImg} 
                 alt="Sayuran Segar" 
-                className="w-full h-full object-contain hover:scale-110 transition duration-500"
+                // object-cover: Memaksa gambar mengisi penuh lingkaran (memotong sudut putih)
+                // scale-100: Memastikan gambar tidak miring/terputar
+                className="w-full h-full object-cover transform scale-110 hover:scale-125 transition duration-500"
                 onError={(e) => {
-                    // Fallback jika gambar gagal load
-                    e.target.src = "https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=2670&auto=format&fit=crop";
+                    e.target.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2574&auto=format&fit=crop";
                 }}
                />
             </div>
           </div>
-          {/* ----------------------------------- */}
+          {/* ----------------------------- */}
 
         </div>
       </section>
