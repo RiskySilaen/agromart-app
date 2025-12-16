@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 // Pastikan file gambar ini ada di folder assets
-import heroImg from "../../assets/Hero_Vege.png";
+import heroImg from "../../assets/logo_agromart.png";
 
 function Home() {
   const navigate = useNavigate();
