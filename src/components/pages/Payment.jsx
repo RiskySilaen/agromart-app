@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../services/database";
 
-// 1. IMPORT GAMBAR ASET LOKAL (Sama seperti di Order.jsx)
+// 1. IMPORT GAMBAR ASET LOKAL
 import bananaImg from "../../assets/buah_banana.jpg";
 import apelImg from "../../assets/apel.jpg";
 import tomatImg from "../../assets/buah_tomat.jpg";
@@ -61,6 +61,7 @@ function Payment({ showNotification, db: database }) {
     setSelectedPayment(method);
   };
 
+  // --- FUNGSI UTAMA: MENYAMBUNGKAN KE WHATSAPP ---
   const processPayment = () => {
     if (!selectedPayment) {
       showNotification("Pilih metode pembayaran terlebih dahulu", "error");
@@ -72,16 +73,47 @@ function Payment({ showNotification, db: database }) {
       return;
     }
 
+    // 1. Simpan Order ke Database dulu (untuk riwayat)
     const result = database.saveOrder(selectedPayment);
+    
     if (result.success) {
-      showNotification(
-        `Pembayaran berhasil! Total: Rp ${result.order.total.toLocaleString(
-          "id-ID"
-        )}`
-      );
+      showNotification("Mengarahkan ke WhatsApp Admin...", "success");
+
+      // 2. Siapkan Nomor WA Admin (GANTI DENGAN NOMOR ASLI ANDA)
+      // Gunakan kode negara '62' tanpa tanda '+'
+      const adminPhoneNumber = "6282199690715"; 
+
+      // 3. Buat Format Pesan Otomatis
+      let message = `Halo Admin *Sayang Agromart*! 👋\n\n`;
+      message += `Saya *${currentUser.name}* ingin menyelesaikan pesanan.\n\n`;
+      message += `📋 *Detail Pesanan:*\n`;
+      
+      cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} x${item.quantity} - Rp ${(item.price * item.quantity).toLocaleString("id-ID")}\n`;
+      });
+
+      message += `\n💰 *Total: Rp ${result.order.total.toLocaleString("id-ID")}*\n`;
+      message += `💳 *Metode Bayar: ${selectedPayment.toUpperCase()}*\n\n`;
+
+      // Tambahkan instruksi sesuai metode bayar
+      if (selectedPayment === "gopay") {
+        message += `Mohon infokan nomor *GOPAY* atau QRIS untuk transfer pembayaran.`;
+      } else if (selectedPayment === "dana") {
+        message += `Mohon infokan nomor *DANA* tujuan untuk transfer.`;
+      } else {
+        message += `Mohon diproses, terima kasih!`;
+      }
+
+      // 4. Buka Link WhatsApp
+      const waUrl = `https://wa.me/${adminPhoneNumber}?text=${encodeURIComponent(message)}`;
+      
+      // Delay sedikit agar user lihat notifikasi dulu
       setTimeout(() => {
-        navigate("/");
-      }, 2000);
+        window.open(waUrl, "_blank");
+        // Opsional: Langsung arahkan kembali ke home atau biarkan di sini
+        navigate("/"); 
+      }, 1000);
+
     } else {
       showNotification(result.message, "error");
     }
@@ -106,12 +138,12 @@ function Payment({ showNotification, db: database }) {
         {/* BAGIAN KIRI (TOTAL & TOMBOL BAYAR) */}
         <div className="bg-white border-4 border-blue-400 p-6 w-full md:w-1/3 flex flex-col items-center justify-center text-center relative z-10">
           <h2 className="font-serif text-xl mb-6">PEMBAYARAN</h2>
-          <div className="w-40 h-40 rounded-full border-2 border-agro-green bg-white mb-8 overflow-hidden flex items-center justify-center">
-             {/* Ganti ikon daun dengan logo */}
+          <div className="w-40 h-40 rounded-full border-2 border-agro-green bg-white mb-8 overflow-hidden flex items-center justify-center p-2">
+             {/* Logo */}
              <img 
                 src={logoAgromart} 
                 alt="Logo" 
-                className="w-full h-full object-cover" 
+                className="w-full h-full object-contain" 
              />
           </div>
           <div className="mb-4">
@@ -122,19 +154,19 @@ function Payment({ showNotification, db: database }) {
           </div>
           <button
             onClick={processPayment}
-            className="bg-agro-green/80 hover:bg-agro-green text-white px-10 py-2 rounded-lg font-bold"
+            className="bg-agro-green/80 hover:bg-agro-green text-white px-10 py-2 rounded-lg font-bold transition transform hover:scale-105"
           >
-            BAYAR
+            BAYAR SEKARANG
           </button>
         </div>
 
         {/* BAGIAN TENGAH (DAFTAR PESANAN) */}
         <div className="p-6 w-full md:w-1/3 flex flex-col">
           <div className="text-right mb-4">
-            <span className="text-sm font-bold">
+            <span className="text-sm font-bold mr-2">
               {currentUser ? currentUser.name : "Guest"}
             </span>
-            <i className="fa-solid fa-circle-user text-2xl align-middle ml-2"></i>
+            <i className="fa-solid fa-circle-user text-2xl align-middle text-agro-green"></i>
           </div>
           <h3 className="font-serif text-sm font-bold mb-4">pesanan anda:</h3>
 
@@ -145,9 +177,9 @@ function Payment({ showNotification, db: database }) {
               </div>
             ) : (
               cart.map((item, index) => (
-                <div key={item.productId} className="flex items-center gap-2">
+                <div key={item.productId} className="flex items-center gap-2 border-b border-gray-100 pb-2">
                   <span>{index + 1}.</span>
-                  {/* --- UPDATE: TAMPILKAN GAMBAR PRODUK --- */}
+                  {/* TAMPILKAN GAMBAR PRODUK */}
                   <div className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                     <img 
                       src={item.image || productImages[item.name] || logoAgromart} 
@@ -156,7 +188,6 @@ function Payment({ showNotification, db: database }) {
                       onError={(e) => {e.target.src = logoAgromart}}
                     />
                   </div>
-                  {/* --------------------------------------- */}
                   <div className="flex-grow">
                     <div className="font-bold">{item.name}</div>
                     <div className="text-[10px] text-gray-500">
@@ -172,7 +203,7 @@ function Payment({ showNotification, db: database }) {
           <div className="flex gap-2 mt-auto">
             <button
               onClick={cancelOrder}
-              className="bg-red-500 text-white text-[10px] py-2 px-4 rounded hover:bg-red-600 flex-1 text-center leading-tight"
+              className="bg-red-500 text-white text-[10px] py-2 px-4 rounded hover:bg-red-600 flex-1 text-center leading-tight transition"
             >
               Batalkan
               <br />
@@ -180,7 +211,7 @@ function Payment({ showNotification, db: database }) {
             </button>
             <button
               onClick={editOrder}
-              className="bg-agro-green text-white text-[10px] py-2 px-4 rounded hover:bg-green-800 flex-1 text-center leading-tight"
+              className="bg-agro-green text-white text-[10px] py-2 px-4 rounded hover:bg-green-800 flex-1 text-center leading-tight transition"
             >
               Edit
               <br />
@@ -191,50 +222,51 @@ function Payment({ showNotification, db: database }) {
 
         {/* BAGIAN KANAN (METODE PEMBAYARAN) */}
         <div className="bg-white rounded-l-[3rem] p-6 w-full md:w-1/3 flex flex-col items-center justify-center shadow-[-10px_0_20px_rgba(0,0,0,0.05)] relative md:-ml-4">
-          <h3 className="text-gray-500 text-sm mb-6">Metode pembayaran</h3>
+          <h3 className="text-gray-500 text-sm mb-6">Pilih Metode Pembayaran</h3>
           <div className="space-y-4 w-full px-8">
             <button
               onClick={() => selectPayment("gopay")}
-              className={`w-full border rounded-xl p-2 flex flex-col items-center hover:bg-blue-50 transition ${
+              className={`w-full border rounded-xl p-3 flex items-center justify-between hover:bg-blue-50 transition transform hover:-translate-y-1 ${
                 selectedPayment === "gopay"
-                  ? "border-agro-green bg-agro-light"
-                  : "border-gray-300"
+                  ? "border-agro-green bg-blue-50 ring-2 ring-agro-green"
+                  : "border-gray-200"
               }`}
             >
               <span className="font-bold text-blue-600">GOPAY</span>
+              {selectedPayment === "gopay" && <i className="fa-solid fa-check-circle text-agro-green"></i>}
             </button>
+
             <button
               onClick={() => selectPayment("dana")}
-              className={`w-full border rounded-xl p-2 flex flex-col items-center hover:bg-blue-50 transition ${
+              className={`w-full border rounded-xl p-3 flex items-center justify-between hover:bg-blue-50 transition transform hover:-translate-y-1 ${
                 selectedPayment === "dana"
-                  ? "border-agro-green bg-agro-light"
-                  : "border-gray-300"
+                  ? "border-agro-green bg-blue-50 ring-2 ring-agro-green"
+                  : "border-gray-200"
               }`}
             >
               <span className="font-bold text-blue-400">DANA</span>
+              {selectedPayment === "dana" && <i className="fa-solid fa-check-circle text-agro-green"></i>}
             </button>
+
             <button
               onClick={() => selectPayment("whatsapp")}
-              className={`w-full border rounded-xl p-2 flex flex-col items-center hover:bg-green-50 transition ${
+              className={`w-full border rounded-xl p-3 flex items-center justify-between hover:bg-green-50 transition transform hover:-translate-y-1 ${
                 selectedPayment === "whatsapp"
-                  ? "border-agro-green bg-agro-light"
-                  : "border-gray-300"
+                  ? "border-agro-green bg-green-50 ring-2 ring-agro-green"
+                  : "border-gray-200"
               }`}
             >
               <div className="flex items-center gap-2 text-green-600 font-bold">
-                <i className="fa-brands fa-whatsapp text-2xl"></i> WhatsApp
+                <i className="fa-brands fa-whatsapp text-xl"></i> WhatsApp
               </div>
+              {selectedPayment === "whatsapp" && <i className="fa-solid fa-check-circle text-agro-green"></i>}
             </button>
           </div>
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">Pilih metode pembayaran</p>
-            <p className="text-sm font-bold text-agro-green mt-2">
-              {selectedPayment === "gopay"
-                ? "GOPAY"
-                : selectedPayment === "dana"
-                ? "DANA"
-                : "WhatsApp"}
-            </p>
+          
+          <div className="mt-8 text-center bg-gray-50 p-3 rounded-lg w-full text-xs text-gray-500">
+            <p className="mb-1">Pembayaran akan diteruskan ke</p>
+            <p className="font-bold text-gray-700">WhatsApp Admin</p>
+            <p className="mt-1">Untuk konfirmasi transfer</p>
           </div>
         </div>
       </div>
