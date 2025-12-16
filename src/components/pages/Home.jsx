@@ -8,7 +8,7 @@ function Home() {
   const navigate = useNavigate();
 
   const handleJoinPartner = () => {
-    const phoneNumber = "6281234567890"; // Ganti dengan nomor WA Anda
+    const phoneNumber = "6282199690715"; // Ganti dengan nomor WA Anda
     const message = "Halo Admin Agromart, saya petani dan ingin menjual hasil panen saya di aplikasi ini. Bagaimana caranya?";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
