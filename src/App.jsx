@@ -76,7 +76,13 @@ function AppContent() {
           <div className="h-20"></div>
 
           <Routes location={location}>
-            <Route path="/" element={<Home />} />
+            
+            {/* --- PERUBAHAN DI SINI: Tambahkan props showNotification --- */}
+            <Route 
+              path="/" 
+              element={<Home showNotification={showNotification} />} 
+            />
+            {/* --------------------------------------------------------- */}
 
             <Route
               path="/products"
@@ -98,7 +104,6 @@ function AppContent() {
               }
             />
 
-            {/* ROUTE ADMIN (WAJIB ADA) */}
             <Route
               path="/admin"
               element={<AdminDashboard showNotification={showNotification} />}
