@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../services/database";
+// 1. IMPORT LOGO AGROMART
+import logoAgromart from "../../assets/logo_agromart.png"; 
 
 function Register({ showNotification, updateUser }) {
   const [formData, setFormData] = useState({
@@ -21,7 +23,6 @@ function Register({ showNotification, updateUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Menggunakan await karena database.js sekarang async (fetch API)
     const result = await db.registerUser(
       formData.name,
       formData.email,
@@ -45,10 +46,18 @@ function Register({ showNotification, updateUser }) {
   return (
     <section className="container mx-auto p-6 flex items-center justify-center min-h-[80vh]">
       <div className="flex flex-col md:flex-row items-center gap-12">
-        <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-agro-green bg-white flex items-center justify-center overflow-hidden shadow-lg">
-          <i className="fas fa-leaf text-7xl text-agro-green"></i>
+        
+        {/* BAGIAN KIRI: LOGO (SUDAH DIGANTI) */}
+        <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-agro-green bg-white flex items-center justify-center overflow-hidden shadow-lg p-2">
+           {/* Ganti ikon daun dengan Image Logo */}
+           <img 
+            src={logoAgromart} 
+            alt="Logo Sayang Agromart" 
+            className="w-full h-full object-contain"
+          />
         </div>
 
+        {/* BAGIAN KANAN: FORM REGISTER */}
         <div className="bg-gradient-to-b from-green-200 via-agro-card-green to-agro-green p-8 rounded-[2rem] shadow-2xl w-full max-w-sm text-center relative">
           <h2 className="font-serif text-2xl font-bold mb-6 text-black/80 tracking-widest">
             DAFTAR
