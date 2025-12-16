@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 // --- PASTIKAN FILE GAMBAR INI ADA ---
-import heroImg from "../../assets/hero_vege.png";
+import heroImg from "../../assets/Hero_Vege.png";
 
 function Home() {
   const navigate = useNavigate();
