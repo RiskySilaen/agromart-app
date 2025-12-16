@@ -109,4 +109,12 @@ function Home() {
             <i className="fas fa-headset"></i>
           </div>
           <h3 className="font-bold text-lg mb-2">Layanan 24/7</h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500">Tim kami siap membantu pesanan Anda kapan saja.</p>
+        </div>
+      </section>
+
+    </div>
+  );
+}
+
+export default Home;
